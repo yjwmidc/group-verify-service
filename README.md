@@ -1,77 +1,44 @@
-![](https://www.thinkphp.cn/uploads/images/20230630/300c856765af4d8ae758c503185f8739.png)
+# group-verify-service
 
-ThinkPHP 8
-===============
+## 简介
 
-## 特性
+一个基于 ThinkPHP 框架的 进群验证后端项目，提供了丰富的功能模块和灵活的扩展能力。
 
-* 基于PHP`8.0+`重构
-* 升级`PSR`依赖
-* 依赖`think-orm`3.0+版本
-* 全新的`think-dumper`服务，支持远程调试
-* 支持`6.0`/`6.1`无缝升级
-
-> ThinkPHP8的运行环境要求PHP8.0+
-
-现在开始，你可以使用官方提供的[ThinkChat](https://chat.topthink.com/)，让你在学习ThinkPHP的旅途中享受私人AI助理服务！
-
-![](https://www.topthink.com/uploads/assistant/20230630/4d1a3f0ad2958b49bb8189b7ef824cb0.png)
-
-ThinkPHP生态服务由[顶想云](https://www.topthink.com)（TOPThink Cloud）提供，为生态提供专业的开发者服务和价值之选。
-
-## 文档
-
-[完全开发手册](https://doc.thinkphp.cn)
+## 项目结构
+app/ 应用目录
+  controller/ 控制器目录
+  middleware/ 中间件目录
+  model/ 模型目录
+  validate/ 验证器目录
+config/ 配置文件目录
+extend/ 扩展目录
+public/ 公共入口目录
+route/ 路由目录
+runtime/ 运行时目录
+vendor/ 第三方依赖项
+view/ 模板目录
 
 
-## 赞助
+## 安装1. 克隆项目到本地：
 
-全新的[赞助计划](https://www.thinkphp.cn/sponsor)可以让你通过我们的网站、手册、欢迎页及GIT仓库获得巨大曝光，同时提升企业的品牌声誉，也更好保障ThinkPHP的可持续发展。
+```bash
+git clone https://github.com/yjwmidc/group-verify-service.git
 
-[![](https://www.thinkphp.cn/sponsor/special.svg)](https://www.thinkphp.cn/sponsor/special)
+安装依赖：
 
-[![](https://www.thinkphp.cn/sponsor.svg)](https://www.thinkphp.cn/sponsor)
+```bash
+composer install
 
-## 安装
+配置环境：
+根据 config/ 目录下的配置文件，修改相关配置以适配您的环境。
 
-~~~
-composer create-project topthink/think tp
-~~~
+使用
+启动开发服务器：
 
-启动服务
+```bash
+php think run 或者在public目录使用 php -S localhost:8000
 
-~~~
-cd tp
-php think run
-~~~
+访问项目：
+在浏览器中打开 http://localhost:8000。
 
-然后就可以在浏览器中访问
-
-~~~
-http://localhost:8000
-~~~
-
-如果需要更新框架使用
-~~~
-composer update topthink/framework
-~~~
-
-## 命名规范
-
-`ThinkPHP`遵循PSR-2命名规范和PSR-4自动加载规范。
-
-## 参与开发
-
-直接提交PR或者Issue即可
-
-## 版权信息
-
-ThinkPHP遵循Apache2开源协议发布，并提供免费使用。
-
-本项目包含的第三方源码和二进制文件之版权信息另行标注。
-
-版权所有Copyright © 2006-2024 by ThinkPHP (http://thinkphp.cn) All rights reserved。
-
-ThinkPHP® 商标和著作权所有者为上海顶想信息科技有限公司。
-
-更多细节参阅 [LICENSE.txt](LICENSE.txt)
+欢迎提交 Issue 或 pr 来帮助改进项目。
