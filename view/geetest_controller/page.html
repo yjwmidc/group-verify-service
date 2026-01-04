@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>入群验证</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @font-face {
+            font-family: "zh-cn";
+            src: url("https://dl.yjwmidc.com/static/hywh.ttf") format("truetype");
+            font-display: swap;
+        }
+        * { font-family: "zh-cn", sans-serif; }
+        body {
+            background: url("https://img.dkdun.cn/v1/2026/17/09f88b4b97cff02d.jpg") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 { color: #333; margin-bottom: 10px; font-size: 24px; }
+        .subtitle { color: #666; margin-bottom: 30px; font-size: 14px; }
+        .captcha-wrapper { margin: 20px 0; min-height: 50px; }
+        .btn-verify {
+            background: linear-gradient(90deg, #00b09b 0%, #96c93d 100%);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-verify:hover { transform: scale(1.05); }
+        .btn-verify:disabled { opacity: 0.6; cursor: not-allowed; }
+        .result { margin-top: 20px; padding: 20px; border-radius: 8px; display: none; }
+        .result.success { background: rgba(212, 237, 218, 0.8); color: #155724; display: block; }
+        .result.error { background: rgba(248, 215, 218, 0.8); color: #721c24; display: block; }
+        .code-display {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            color: #00b09b;
+            margin: 15px 0;
+            font-family: "zh-cn", monospace;
+        }
+        .btn-copy {
+            background: rgba(0, 176, 155, 0.8);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            display: none;
+        }
+        .btn-copy:hover { background: rgba(0, 176, 155, 1); transform: scale(1.05); }
+        .btn-copy:active { transform: scale(0.95); }
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .tip { font-size: 12px; color: #888; margin-top: 15px; }
+        .status { color: #666; font-size: 14px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 入群验证</h1>
+        <p class="subtitle">请点击按钮完成人机验证</p>
+        
+        <div class="captcha-wrapper">
+            <button type="button" class="btn-verify" id="btn-verify">点击进行验证</button>
+        </div>
+        
+        <p class="status" id="status"></p>
+        
+        <div class="result" id="result">
+            <p id="result-text"></p>
+            <div class="code-display" id="code-display"></div>
+            <button type="button" class="btn-copy" id="btn-copy">📋 一键复制验证码</button>
+            <p class="tip" id="tip"></p>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script src="https://static.geetest.com/v4/gt4.js"></script>
+    <script>
+        // 使用 TPL 语法输出 PHP 变量
+        var TOKEN = "{$token}";
+        var CAPTCHA_ID = "{$captcha_id}";
+        var captchaObj = null;
+        var verifyCode = "";
+        var btn = document.getElementById("btn-verify");
+        var status = document.getElementById("status");
+        
+        initGeetest4({
+            captchaId: CAPTCHA_ID,
+            product: "bind",
+            language: "zh-cn"
+        }, function(obj) {
+            captchaObj = obj;
+            
+            captchaObj.onReady(function() {
+                status.textContent = "验证码已就绪";
+                btn.disabled = false;
+            });
+            
+            captchaObj.onSuccess(function() {
+                var result = captchaObj.getValidate();
+                if (!result) {
+                    showError("请完成验证");
+                    return;
+                }
+                
+                btn.disabled = true;
+                btn.textContent = "验证中...";
+                status.textContent = "正在验证，请稍候...";
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/verify/callback", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                var data = JSON.parse(xhr.responseText);
+                                if (data.status === 200) {
+                                    showSuccess(data.data.code);
+                                } else {
+                                    showError(data.msg || "验证失败");
+                                    resetCaptcha();
+                                }
+                            } catch(e) {
+                                showError("响应解析失败");
+                                resetCaptcha();
+                            }
+                        } else {
+                            showError("网络错误，请重试");
+                            resetCaptcha();
+                        }
+                    }
+                };
+                
+                var params = "token=" + encodeURIComponent(TOKEN) +
+                    "&lot_number=" + encodeURIComponent(result.lot_number) +
+                    "&captcha_output=" + encodeURIComponent(result.captcha_output) +
+                    "&pass_token=" + encodeURIComponent(result.pass_token) +
+                    "&gen_time=" + encodeURIComponent(result.gen_time);
+                
+                xhr.send(params);
+            });
+            
+            captchaObj.onError(function(e) {
+                status.textContent = "验证码加载失败，请刷新页面";
+                console.error("Geetest error:", e);
+            });
+            
+            captchaObj.onClose(function() {
+                status.textContent = "已取消验证";
+            });
+        });
+        
+        btn.onclick = function() {
+            if (captchaObj) {
+                captchaObj.showCaptcha();
+            } else {
+                status.textContent = "验证码正在加载，请稍候...";
+            }
+        };
+        
+        document.getElementById("btn-copy").onclick = function() {
+            copyToClipboard(verifyCode);
+        };
+        
+        function resetCaptcha() {
+            btn.disabled = false;
+            btn.textContent = "点击重新验证";
+            if (captchaObj) {
+                captchaObj.reset();
+            }
+        }
+        
+        function showSuccess(code) {
+            verifyCode = code;
+            document.getElementById("result").className = "result success";
+            document.getElementById("result-text").textContent = "✅ 验证成功！您的验证码是：";
+            document.getElementById("code-display").textContent = code;
+            document.getElementById("tip").textContent = "请复制此验证码，在群内发送以完成入群验证";
+            document.querySelector(".captcha-wrapper").style.display = "none";
+            status.style.display = "none";
+            document.getElementById("btn-copy").style.display = "inline-block";
+        }
+        
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(function() {
+                    showToast("✅ 已复制验证码，请前往群聊中发送");
+                }).catch(function() {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                var successful = document.execCommand("copy");
+                if (successful) {
+                    showToast("✅ 已复制验证码，请前往群聊中发送");
+                } else {
+                    showToast("❌ 复制失败，请手动复制");
+                }
+            } catch (err) {
+                showToast("❌ 复制失败，请手动复制");
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        function showToast(message) {
+            var toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.style.display = "block";
+            
+            setTimeout(function() {
+                toast.style.display = "none";
+            }, 2000);
+        }
+        
+        function showError(msg) {
+            status.textContent = "❌ " + msg;
+            status.style.color = "#dc3545";
+        }
+    </script>
+</body>
+</html>
