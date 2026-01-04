@@ -1,19 +1,19 @@
 <?php
 //接口配置
 return [
-    'Captcha' => '9cfd862579c55ccf5f92f673a75cd38b',
-    'CaptchaKey' => 'fd982638c8dac52157b2f8c6a26230de',
+    //captcha配置
+    'Captcha' => '',
+    'CaptchaKey' => '',
+    //api服务端配置
     'ApiServer' => 'https://gcaptcha4.geetest.com',
     
     // 验证码有效期/s
     'notBefore' => 300,
     //表名
-    'TableName'    => 'ValidateTable',
+    'TableName'    => 'Validate',
     'cache_prefix' => 'geetest:token:',
-    
+    //缓存目录
     'storage_path' => 'runtime/Geetest/',
-    'api_keys' => [
-        'key1',
-        'key2',
-    ],
+    //api密钥
+    'api_keys' => ['key1','key2',],
 ];
