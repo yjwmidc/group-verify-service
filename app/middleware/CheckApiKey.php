@@ -26,12 +26,12 @@ class CheckApiKey
             $token = substr($token, 7); //bearer+空格 去掉 刚好7个字符
         }
         
-        //序列化 有控股就去掉
+        //序列化 有空格就去掉
         $token = trim($token);
-        //api 允许
+        //从配置文件里读
         $allowedKeys = config('geetest.api_keys', []);
 
-        // 5. 验证是否在白名单中
+        //验证是否在白名单中
         if (!in_array($token, $allowedKeys)) {
             $result = ['status' => 403, 'msg' => 'apikey不存在'];
             return json($result);
