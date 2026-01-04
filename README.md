@@ -6,39 +6,71 @@
 
 ## 项目结构
 app/ 应用目录
+
   controller/ 控制器目录
+  
   middleware/ 中间件目录
+  
   model/ 模型目录
+  
   validate/ 验证器目录
+  
 config/ 配置文件目录
+
 extend/ 扩展目录
+
 public/ 公共入口目录
+
 route/ 路由目录
+
 runtime/ 运行时目录
+
 vendor/ 第三方依赖项
+
 view/ 模板目录
 
 
-## 安装1. 克隆项目到本地：
-
-```bash
+## 下载项目到本地
 git clone https://github.com/yjwmidc/group-verify-service.git
 
-安装依赖：
+## 安装依赖：
 
-```bash
 composer install
 
-配置环境：
+## 配置环境：
 根据 config/ 目录下的配置文件，修改相关配置以适配您的环境。
 
-使用
-启动开发服务器：
+## 使用
+## 启动开发服务器：
 
-```bash
 php think run 或者在public目录使用 php -S localhost:8000
 
-访问项目：
+## 使用nginx:
+要求php环境:开启opcache扩展 开启fileinfo扩展
+
+root目录设置到 public
+
+设置URL重写规则:
+>
+> ```nginx
+> location / {
+>     if (!-e $request_filename){
+>         rewrite  ^(.*)$  /index.php?s=$1  last;   break;
+>     }
+> }
+
+## 访问项目：
 在浏览器中打开 http://localhost:8000。
+
+## 致谢:
+
+thinkphp[https://github.com/top-think/think]
+
+think-orm[https://github.com/top-think/think-orm]
+
+think-helper[https://github.com/top-think/think-helper]
+
+think-trace[https://github.com/top-think/think-helper]
+
 
 欢迎提交 Issue 或 pr 来帮助改进项目。
