@@ -64,13 +64,12 @@ root目录设置到 public
 
 ## 致谢:
 
-thinkphp[https://github.com/top-think/think]
-
-think-orm[https://github.com/top-think/think-orm]
-
-think-helper[https://github.com/top-think/think-helper]
-
-think-trace[https://github.com/top-think/think-helper]
-
+[thinkphp](https://github.com/top-think/think)
+[think-orm](https://github.com/top-think/think-orm)
+[think-helper](https://github.com/top-think/think-helper)
+[think-trace](https://github.com/top-think/think-helper)
+[think-filesystem](https://github.com/top-think/think-filesystem)
+[think-view](https://github.com/top-think/think-view)
+[think-dumper](https://github.com/top-think/think-dumper)
 
 欢迎提交 Issue 或 pr 来帮助改进项目。
